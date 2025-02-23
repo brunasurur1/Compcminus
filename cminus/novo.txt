@@ -1,0 +1,17 @@
+make clean
+make
+
+se aparecer  -bash: make: command not found, faça:
+
+pacman -S make
+
+depois :
+
+make clean
+make
+
+ai depois faz os testes:
+
+./cminus < test2.cminus
+
+
