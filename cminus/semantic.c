@@ -5,4 +5,4 @@
 
 void checkNode(/* parâmetros */) {
     // Exemplo de função para checar um nó da árvore
-}
+}   

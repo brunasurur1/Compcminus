@@ -51,14 +51,14 @@ static char escopoAtual[64] = "global";
 %%
 
 program:
-    declaration_list 
-    { 
+    declaration_list
+    {
       $$ = newASTNode(NODE_PROGRAM, "program", 0);
       addChild($$, $1);
       imprimeTabela();
-      printf("\nÁrvore Sintática:\n");
-      printAST($$, 0);
-      printf("\nCompilação encerrada com sucesso.\n");
+      printf("\nArvore Sintatica:\n");
+      printAST($$, 0, 1);
+      printf("\nCompilacao encerrada com sucesso.\n");
     }
 ;
 
@@ -85,7 +85,7 @@ var_declaration:
     type_specifier ID ';'
     {
        if ($1 == TIPO_VOID) {
-           fprintf(stderr, "ERRO SEMÂNTICO: Variável \"%s\" não pode ter tipo void. Linha: %d\n", $2, yylineno);
+           fprintf(stderr, "ERRO SEMANTICO: Variavel \"%s\" nao pode ter tipo void. Linha: %d\n", $2, yylineno);
            $$ = newASTNode(NODE_VAR_DECL, "var_decl", 0);
        } else {
            insereSimbolo($2, $1, escopoAtual);
@@ -96,7 +96,7 @@ var_declaration:
     | type_specifier ID '[' NUM ']' ';'
     {
        if ($1 == TIPO_VOID) {
-           fprintf(stderr, "ERRO SEMÂNTICO: Array \"%s\" não pode ter tipo void. Linha: %d\n", $2, yylineno);
+           fprintf(stderr, "ERRO SEMANTICO: Array \"%s\" nao pode ter tipo void. Linha: %d\n", $2, yylineno);
            $$ = newASTNode(NODE_VAR_DECL, "array_decl", 0);
        } else {
            insereSimbolo($2, $1, escopoAtual);
@@ -159,7 +159,7 @@ param:
     type_specifier ID
     {
       if ($1 == TIPO_VOID) {
-          fprintf(stderr, "ERRO SEMÂNTICO: Parâmetro \"%s\" não pode ter tipo void. Linha: %d\n", $2, yylineno);
+          fprintf(stderr, "ERRO SEMANTICO: Parametro \"%s\" nao pode ter tipo void. Linha: %d\n", $2, yylineno);
           $$ = newASTNode(NODE_PARAM, "param", 0);
       } else {
           insereSimbolo($2, $1, escopoAtual);
@@ -170,7 +170,7 @@ param:
     | type_specifier ID '[' ']'
     {
       if ($1 == TIPO_VOID) {
-          fprintf(stderr, "ERRO SEMÂNTICO: Parâmetro array \"%s\" não pode ter tipo void. Linha: %d\n", $2, yylineno);
+          fprintf(stderr, "ERRO SEMANTICO: Parametro array \"%s\" nao pode ter tipo void. Linha: %d\n", $2, yylineno);
           $$ = newASTNode(NODE_PARAM, "param_array", 0);
       } else {
           insereSimbolo($2, $1, escopoAtual);
@@ -285,7 +285,7 @@ var:
           s = buscaSimbolo($1, "global");
       }
       if (!s) {
-          fprintf(stderr, "ERRO SEMÂNTICO: Variável \"%s\" não declarada. Linha: %d\n", $1, yylineno);
+          fprintf(stderr, "ERRO SEMANTICO: Variavel \"%s\" nao declarada. Linha: %d\n", $1, yylineno);
       }
       $$ = newASTNode(NODE_ID, $1, 0);
       free($1);
@@ -297,7 +297,7 @@ var:
           s = buscaSimbolo($1, "global");
       }
       if (!s) {
-          fprintf(stderr, "ERRO SEMÂNTICO: Array \"%s\" não declarado. Linha: %d\n", $1, yylineno);
+          fprintf(stderr, "ERRO SEMANTICO: Array \"%s\" nao declarado. Linha: %d\n", $1, yylineno);
       }
       $$ = newASTNode(NODE_OP, "array", 0);
       addChild($$, newASTNode(NODE_ID, $1, 0));
@@ -311,7 +311,7 @@ activation:
     {
          Simbolo *s = buscaSimbolo($1, "global");
          if (!s) {
-             fprintf(stderr, "ERRO SEMÂNTICO: Função \"%s\" não declarada. Linha: %d\n", $1, yylineno);
+             fprintf(stderr, "ERRO SEMANTICO: Funcao \"%s\" nao declarada. Linha: %d\n", $1, yylineno);
          }
          $$ = newASTNode(NODE_ACTIVATION, $1, 0);
          addChild($$, $3);
@@ -401,7 +401,7 @@ type_specifier:
 %%
 
 void yyerror(const char *s) {
-    fprintf(stderr, "ERRO SINTÁTICO: %s na linha %d\n", s, yylineno);
+    fprintf(stderr, "ERRO SINTATICO: %s na linha %d\n", s, yylineno);
 }
 
 int main(void) {

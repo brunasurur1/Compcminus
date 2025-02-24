@@ -26,7 +26,7 @@ Simbolo* buscaSimbolo(char *nome, const char *escopo) {
 }
 
 void imprimeTabela(void) {
-    printf("\n=== Tabela de Símbolos ===\n");
+    printf("\n=== Tabela de Sambolos ===\n");
     printf("%-10s %-10s %-10s\n", "Nome", "Tipo", "Escopo");
     printf("--------------------------------\n");
     Simbolo *atual = listaSimbolos;

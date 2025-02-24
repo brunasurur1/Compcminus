@@ -1,4 +1,4 @@
-#ifndef SYMBOLTABLE_H
+ #ifndef SYMBOLTABLE_H
 #define SYMBOLTABLE_H
 
 typedef enum { TIPO_INT, TIPO_VOID } TipoSimbolo;
@@ -15,4 +15,4 @@ Simbolo* buscaSimbolo(char *nome, const char *escopo);
 void imprimeTabela(void);
 void limpaTabela(void);
 
-#endif
+#endif   

@@ -1,4 +1,4 @@
-#ifndef SEMANTIC_H
+ #ifndef SEMANTIC_H
 #define SEMANTIC_H
 
 #ifdef __cplusplus

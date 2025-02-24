@@ -1194,13 +1194,13 @@ yyreduce:
     {
   case 2: /* program: declaration_list  */
 #line 55 "cminus.y"
-    { 
+    {
       (yyval.ast) = newASTNode(NODE_PROGRAM, "program", 0);
       addChild((yyval.ast), (yyvsp[0].ast));
       imprimeTabela();
-      printf("\nÁrvore Sintática:\n");
-      printAST((yyval.ast), 0);
-      printf("\nCompilação encerrada com sucesso.\n");
+      printf("\nArvore Sintatica:\n");
+      printAST((yyval.ast), 0, 1);
+      printf("\nCompilacao encerrada com sucesso.\n");
     }
 #line 1206 "cminus.tab.c"
     break;
@@ -1240,7 +1240,7 @@ yyreduce:
 #line 86 "cminus.y"
     {
        if ((yyvsp[-2].tipoToken) == TIPO_VOID) {
-           fprintf(stderr, "ERRO SEMÂNTICO: Variável \"%s\" não pode ter tipo void. Linha: %d\n", (yyvsp[-1].id), yylineno);
+           fprintf(stderr, "ERRO SEMANTICO: Variavel \"%s\" nao pode ter tipo void. Linha: %d\n", (yyvsp[-1].id), yylineno);
            (yyval.ast) = newASTNode(NODE_VAR_DECL, "var_decl", 0);
        } else {
            insereSimbolo((yyvsp[-1].id), (yyvsp[-2].tipoToken), escopoAtual);
@@ -1255,7 +1255,7 @@ yyreduce:
 #line 97 "cminus.y"
     {
        if ((yyvsp[-5].tipoToken) == TIPO_VOID) {
-           fprintf(stderr, "ERRO SEMÂNTICO: Array \"%s\" não pode ter tipo void. Linha: %d\n", (yyvsp[-4].id), yylineno);
+           fprintf(stderr, "ERRO SEMANTICO: Array \"%s\" nao pode ter tipo void. Linha: %d\n", (yyvsp[-4].id), yylineno);
            (yyval.ast) = newASTNode(NODE_VAR_DECL, "array_decl", 0);
        } else {
            insereSimbolo((yyvsp[-4].id), (yyvsp[-5].tipoToken), escopoAtual);
@@ -1331,7 +1331,7 @@ yyreduce:
 #line 160 "cminus.y"
     {
       if ((yyvsp[-1].tipoToken) == TIPO_VOID) {
-          fprintf(stderr, "ERRO SEMÂNTICO: Parâmetro \"%s\" não pode ter tipo void. Linha: %d\n", (yyvsp[0].id), yylineno);
+          fprintf(stderr, "ERRO SEMANTICO: Parametro \"%s\" nao pode ter tipo void. Linha: %d\n", (yyvsp[0].id), yylineno);
           (yyval.ast) = newASTNode(NODE_PARAM, "param", 0);
       } else {
           insereSimbolo((yyvsp[0].id), (yyvsp[-1].tipoToken), escopoAtual);
@@ -1346,7 +1346,7 @@ yyreduce:
 #line 171 "cminus.y"
     {
       if ((yyvsp[-3].tipoToken) == TIPO_VOID) {
-          fprintf(stderr, "ERRO SEMÂNTICO: Parâmetro array \"%s\" não pode ter tipo void. Linha: %d\n", (yyvsp[-2].id), yylineno);
+          fprintf(stderr, "ERRO SEMANTICO: Parametro array \"%s\" nao pode ter tipo void. Linha: %d\n", (yyvsp[-2].id), yylineno);
           (yyval.ast) = newASTNode(NODE_PARAM, "param_array", 0);
       } else {
           insereSimbolo((yyvsp[-2].id), (yyvsp[-3].tipoToken), escopoAtual);
@@ -1517,7 +1517,7 @@ yyreduce:
           s = buscaSimbolo((yyvsp[0].id), "global");
       }
       if (!s) {
-          fprintf(stderr, "ERRO SEMÂNTICO: Variável \"%s\" não declarada. Linha: %d\n", (yyvsp[0].id), yylineno);
+          fprintf(stderr, "ERRO SEMANTICO: Variavel \"%s\" nao declarada. Linha: %d\n", (yyvsp[0].id), yylineno);
       }
       (yyval.ast) = newASTNode(NODE_ID, (yyvsp[0].id), 0);
       free((yyvsp[0].id));
@@ -1533,7 +1533,7 @@ yyreduce:
           s = buscaSimbolo((yyvsp[-3].id), "global");
       }
       if (!s) {
-          fprintf(stderr, "ERRO SEMÂNTICO: Array \"%s\" não declarado. Linha: %d\n", (yyvsp[-3].id), yylineno);
+          fprintf(stderr, "ERRO SEMANTICO: Array \"%s\" nao declarado. Linha: %d\n", (yyvsp[-3].id), yylineno);
       }
       (yyval.ast) = newASTNode(NODE_OP, "array", 0);
       addChild((yyval.ast), newASTNode(NODE_ID, (yyvsp[-3].id), 0));
@@ -1548,7 +1548,7 @@ yyreduce:
     {
          Simbolo *s = buscaSimbolo((yyvsp[-3].id), "global");
          if (!s) {
-             fprintf(stderr, "ERRO SEMÂNTICO: Função \"%s\" não declarada. Linha: %d\n", (yyvsp[-3].id), yylineno);
+             fprintf(stderr, "ERRO SEMANTICO: Funcao \"%s\" nao declarada. Linha: %d\n", (yyvsp[-3].id), yylineno);
          }
          (yyval.ast) = newASTNode(NODE_ACTIVATION, (yyvsp[-3].id), 0);
          addChild((yyval.ast), (yyvsp[-1].ast));
@@ -1923,7 +1923,7 @@ yyreturnlab:
 
 
 void yyerror(const char *s) {
-    fprintf(stderr, "ERRO SINTÁTICO: %s na linha %d\n", s, yylineno);
+    fprintf(stderr, "ERRO SINTATICO: %s na linha %d\n", s, yylineno);
 }
 
 int main(void) {

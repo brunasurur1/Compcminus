@@ -41,7 +41,7 @@ typedef struct ASTNode {
 
 ASTNode *newASTNode(ASTNodeType type, const char *value, int num);
 void addChild(ASTNode *parent, ASTNode *child);
-void printAST(ASTNode *node, int indent);
+void printAST(ASTNode *node, int indent, int isLast);
 void freeAST(ASTNode *node);
 
 #endif
