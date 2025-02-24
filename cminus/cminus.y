@@ -86,6 +86,7 @@ var_declaration:
     {
        if ($1 == TIPO_VOID) {
            fprintf(stderr, "ERRO SEMANTICO: Variavel \"%s\" nao pode ter tipo void. Linha: %d\n", $2, yylineno);
+	   exit(1);
            $$ = newASTNode(NODE_VAR_DECL, "var_decl", 0);
        } else {
            insereSimbolo($2, $1, escopoAtual);
@@ -97,7 +98,8 @@ var_declaration:
     {
        if ($1 == TIPO_VOID) {
            fprintf(stderr, "ERRO SEMANTICO: Array \"%s\" nao pode ter tipo void. Linha: %d\n", $2, yylineno);
-           $$ = newASTNode(NODE_VAR_DECL, "array_decl", 0);
+           exit(1);
+	   $$ = newASTNode(NODE_VAR_DECL, "array_decl", 0);
        } else {
            insereSimbolo($2, $1, escopoAtual);
            $$ = newASTNode(NODE_VAR_DECL, $2, 0);
@@ -160,6 +162,7 @@ param:
     {
       if ($1 == TIPO_VOID) {
           fprintf(stderr, "ERRO SEMANTICO: Parametro \"%s\" nao pode ter tipo void. Linha: %d\n", $2, yylineno);
+	  exit(1);
           $$ = newASTNode(NODE_PARAM, "param", 0);
       } else {
           insereSimbolo($2, $1, escopoAtual);
@@ -171,6 +174,7 @@ param:
     {
       if ($1 == TIPO_VOID) {
           fprintf(stderr, "ERRO SEMANTICO: Parametro array \"%s\" nao pode ter tipo void. Linha: %d\n", $2, yylineno);
+          exit(1);
           $$ = newASTNode(NODE_PARAM, "param_array", 0);
       } else {
           insereSimbolo($2, $1, escopoAtual);
@@ -286,6 +290,7 @@ var:
       }
       if (!s) {
           fprintf(stderr, "ERRO SEMANTICO: Variavel \"%s\" nao declarada. Linha: %d\n", $1, yylineno);
+	  exit(1);
       }
       $$ = newASTNode(NODE_ID, $1, 0);
       free($1);
@@ -298,6 +303,7 @@ var:
       }
       if (!s) {
           fprintf(stderr, "ERRO SEMANTICO: Array \"%s\" nao declarado. Linha: %d\n", $1, yylineno);
+	  exit(1);
       }
       $$ = newASTNode(NODE_OP, "array", 0);
       addChild($$, newASTNode(NODE_ID, $1, 0));
@@ -312,6 +318,7 @@ activation:
          Simbolo *s = buscaSimbolo($1, "global");
          if (!s) {
              fprintf(stderr, "ERRO SEMANTICO: Funcao \"%s\" nao declarada. Linha: %d\n", $1, yylineno);
+             exit(1);
          }
          $$ = newASTNode(NODE_ACTIVATION, $1, 0);
          addChild($$, $3);
@@ -402,6 +409,7 @@ type_specifier:
 
 void yyerror(const char *s) {
     fprintf(stderr, "ERRO SINTATICO: %s na linha %d\n", s, yylineno);
+    exit(1);
 }
 
 int main(void) {

@@ -43,7 +43,9 @@ ID          {LETRA}({LETRA}|{DIGITO})*
 {ID}                { yylval.id = strdup(yytext); return ID; }
 [ \t\r\n]+          { }
 "/*"[^*]*"*/"       { }
-.                   { fprintf(stderr, "ERRO LÉXICO: \"%s\" na linha %d\n", yytext, yylineno); }
+.                   { fprintf(stderr, "ERRO LEXICO: \"%s\" na linha %d\n", yytext, yylineno); 
+		    exit(1);
+}
 
 %%
 

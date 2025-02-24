@@ -948,14 +948,16 @@ YY_RULE_SETUP
 case 30:
 YY_RULE_SETUP
 #line 46 "cminus.l"
-{ fprintf(stderr, "ERRO LÉXICO: \"%s\" na linha %d\n", yytext, yylineno); }
+{ fprintf(stderr, "ERRO LEXICO: \"%s\" na linha %d\n", yytext, yylineno); 
+		    exit(1);
+}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 48 "cminus.l"
+#line 50 "cminus.l"
 ECHO;
 	YY_BREAK
-#line 958 "lex.yy.c"
+#line 960 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1972,7 +1974,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 48 "cminus.l"
+#line 50 "cminus.l"
 
 
 int yywrap(void) { return 1; }
