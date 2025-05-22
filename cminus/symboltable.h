@@ -14,5 +14,6 @@ void insereSimbolo(char *nome, TipoSimbolo tipo, const char *escopo);
 Simbolo* buscaSimbolo(char *nome, const char *escopo);
 void imprimeTabela(void);
 void limpaTabela(void);
+void initSymbolTable(void);
 
 #endif   

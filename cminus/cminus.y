@@ -9,6 +9,9 @@
 #include "symboltable.h"
 #include "ast.h"
 
+/* Variável global para armazenar a raiz da AST */
+ASTNode* arvoreAST = NULL;
+
 /* Declaração de yylineno, definida pelo Flex (%option yylineno) */
 extern int yylineno;
 
@@ -55,6 +58,7 @@ program:
     {
       $$ = newASTNode(NODE_PROGRAM, "program", 0);
       addChild($$, $1);
+      arvoreAST = $$;
       imprimeTabela();
       printf("\nArvore Sintatica:\n");
       printAST($$, 0, 1);
@@ -86,7 +90,7 @@ var_declaration:
     {
        if ($1 == TIPO_VOID) {
            fprintf(stderr, "ERRO SEMANTICO: Variavel \"%s\" nao pode ter tipo void. Linha: %d\n", $2, yylineno);
-	   exit(1);
+           exit(1);
            $$ = newASTNode(NODE_VAR_DECL, "var_decl", 0);
        } else {
            insereSimbolo($2, $1, escopoAtual);
@@ -99,7 +103,7 @@ var_declaration:
        if ($1 == TIPO_VOID) {
            fprintf(stderr, "ERRO SEMANTICO: Array \"%s\" nao pode ter tipo void. Linha: %d\n", $2, yylineno);
            exit(1);
-	   $$ = newASTNode(NODE_VAR_DECL, "array_decl", 0);
+           $$ = newASTNode(NODE_VAR_DECL, "array_decl", 0);
        } else {
            insereSimbolo($2, $1, escopoAtual);
            $$ = newASTNode(NODE_VAR_DECL, $2, 0);
@@ -162,7 +166,7 @@ param:
     {
       if ($1 == TIPO_VOID) {
           fprintf(stderr, "ERRO SEMANTICO: Parametro \"%s\" nao pode ter tipo void. Linha: %d\n", $2, yylineno);
-	  exit(1);
+          exit(1);
           $$ = newASTNode(NODE_PARAM, "param", 0);
       } else {
           insereSimbolo($2, $1, escopoAtual);
@@ -290,7 +294,7 @@ var:
       }
       if (!s) {
           fprintf(stderr, "ERRO SEMANTICO: Variavel \"%s\" nao declarada. Linha: %d\n", $1, yylineno);
-	  exit(1);
+          exit(1);
       }
       $$ = newASTNode(NODE_ID, $1, 0);
       free($1);
@@ -303,7 +307,7 @@ var:
       }
       if (!s) {
           fprintf(stderr, "ERRO SEMANTICO: Array \"%s\" nao declarado. Linha: %d\n", $1, yylineno);
-	  exit(1);
+          exit(1);
       }
       $$ = newASTNode(NODE_OP, "array", 0);
       addChild($$, newASTNode(NODE_ID, $1, 0));
@@ -412,12 +416,15 @@ void yyerror(const char *s) {
     exit(1);
 }
 
-int main(void) {
+ASTNode* parsear(void) {
+    initSymbolTable();
+
     insereSimbolo("input", TIPO_INT, "global");
     insereSimbolo("output", TIPO_VOID, "global");
     strcpy(escopoAtual, "global");
+
     if (!yyparse())
-        return 0;
+        return arvoreAST;
     else
-        return 1;
+        return NULL;
 }

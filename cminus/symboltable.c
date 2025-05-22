@@ -49,3 +49,7 @@ void limpaTabela(void) {
     }
     listaSimbolos = NULL;
 }
+
+void initSymbolTable(void) {
+    listaSimbolos = NULL;
+}

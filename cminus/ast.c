@@ -88,12 +88,6 @@ void printAST(ASTNode *node, int indent, int isLast) {
         case NODE_EXPRESSION_DECL:
             printf("expr_decl\n");
             break;
-        case NODE_EXPRESSION:
-            printf("expression\n");
-            break;
-        case NODE_VAR:
-            printf("var: %s\n", node->value);
-            break;
         case NODE_ACTIVATION:
             printf("chamada %s\n", node->value);
             break;
@@ -102,9 +96,6 @@ void printAST(ASTNode *node, int indent, int isLast) {
             break;
         case NODE_ARG_LIST:
             printf("arg_list\n");
-            break;
-        case NODE_SIMPLE_EXPR:
-            printf("op: %s\n", node->value);
             break;
         case NODE_OP:
             printf("op: %s\n", node->value);

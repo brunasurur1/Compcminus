@@ -80,7 +80,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 23 "cminus.y"
+#line 26 "cminus.y"
 
     int num;         /* Para NUM */
     char *id;        /* Para IDs ou strings (ex: operadores) */

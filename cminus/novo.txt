@@ -1,11 +1,12 @@
 make clean
 make
 
-se aparecer  -bash: make: command not found, faça:
+se aparecer  -bash: make: command not found
 
+Fazer: 
 pacman -S make
 
-depois :
+depois tentar de novo make clean:
 
 make clean
 make

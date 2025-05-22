@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "symboltable.h"
+#include "codintermed.h"
 
 // Definir a variável global lineno
 int lineno = 1;
 
 extern FILE *yyin;
-extern int yyparse();
+ASTNode* parsear(void);
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
@@ -19,14 +20,19 @@ int main(int argc, char *argv[]) {
         perror(argv[1]);
         return 1;
     }
+
     yyin = f;
 
-    // Inicializa a tabela de símbolos
-    initSymbolTable();
+    ASTNode* raiz = parsear();
 
-    // Chama o parser (que invoca o scanner)
-    yyparse();
+    if (raiz) {
+        geraCodigo(raiz);              
+        printCodigoIntermediario();    
+    } else {
+        printf("Erro na análise sintática.\n");
+    }
+
 
     fclose(f);
-    return 0;
+    return 0;	
 }
