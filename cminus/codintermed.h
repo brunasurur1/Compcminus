@@ -16,9 +16,9 @@ extern Quadrupla quads[1000];
 extern int quadIndex;
 
 // Declaração das funções disponíveis
-void emit(const char* op, const char* arg1, const char* arg2, const char* result);
+void emit(const char* op, const char* result, const char* arg1, const char* arg2);
 char* newTemp();
 char* geraCodigo(ASTNode* node);
-void printCodigoIntermediario();
+void printCodigoIntermediario(void);
 
 #endif
