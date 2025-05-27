@@ -1,8 +1,7 @@
 void main(void) {
-    int a;
-    int b;
-    int c;
-    a = 2;
-    b = 3;
-    c = a + b;
+    int a[10];
+    int i;
+    int x;
+    i = 2;
+    x = a[i];
 }

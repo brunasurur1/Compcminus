@@ -150,8 +150,7 @@ params:
 param_list:
     param_list ',' param
     {
-       $$ = newASTNode(NODE_PARAM_LIST, "param_list", 0);
-       addChild($$, $1);
+       $$ = $1;
        addChild($$, $3);
     }
     | param
@@ -200,8 +199,7 @@ compound_decl:
 local_declarations:
     local_declarations var_declaration
     {
-       $$ = newASTNode(NODE_LOCAL_DECLS, "local_decls", 0);
-       addChild($$, $1);
+       $$ = $1;
        addChild($$, $2);
     }
     | /* vazio */
@@ -213,8 +211,7 @@ local_declarations:
 statement_list:
     statement_list statement
     {
-       $$ = newASTNode(NODE_STATEMENT_LIST, "stmt_list", 0);
-       addChild($$, $1);
+       $$ = $1;
        addChild($$, $2);
     }
     | /* vazio */
@@ -338,12 +335,14 @@ args:
 arg_list:
     arg_list ',' expression
     {
-       $$ = newASTNode(NODE_ARG_LIST, "arg_list", 0);
-       addChild($$, $1);
+       $$ = $1;
        addChild($$, $3);
     }
     | expression
-    { $$ = newASTNode(NODE_ARG_LIST, "arg_list", 0); addChild($$, $1); }
+    { 
+       $$ = newASTNode(NODE_ARG_LIST, "arg_list", 0); 
+       addChild($$, $1); 
+    }
 ;
 
 simple_expression:

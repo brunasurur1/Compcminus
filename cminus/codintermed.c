@@ -37,7 +37,9 @@ char* newTemp() {
 
 int precisaLoad(const char* nome) {
     if (nome == NULL || strcmp(nome, "-") == 0) return 0;
-    return !(nome[0] == 't' || isdigit(nome[0]));
+    
+    int precisa = !(nome[0] == 't' || isdigit(nome[0]));
+    return precisa;
 }
 
 const char* traduzOperador(const char* op) {
@@ -67,8 +69,8 @@ void processaArgs(ASTNode* node, int* numArgs) {
         if (arg == NULL) {
             printf("ERRO: argumento retornou NULL\n");
 	    printf("Tipo do nó que falhou: %d\n", node->type);
-printf("Nome textual (node->value): %s\n", node->value ? node->value : "NULL");
-printf("Número de filhos: %d\n\n", node->nchildren);
+	    printf("Nome textual (node->value): %s\n", node->value ? node->value : "NULL");
+	    printf("Número de filhos: %d\n\n", node->nchildren);
 	    if (node->value != NULL){
 		printf("Valor: %s\n", node->value);
 	    }
@@ -87,15 +89,14 @@ printf("Número de filhos: %d\n\n", node->nchildren);
 }
 
 void processaParams(ASTNode* node, const char* nomeFunc) {
-    if (node == NULL) return;
+    if (node == NULL || node->type != NODE_PARAM_LIST) return;
 
-    if (node->type == NODE_PARAM_LIST) {
-        for (int i = 0; i < node->nchildren; i++) {
-            processaParams(node->children[i], nomeFunc);
+    for (int i = 0; i < node->nchildren; i++) {
+        ASTNode* param = node->children[i];
+        if (param->type == NODE_PARAM) {
+            char* nome = param->value;
+            emit("ARG", "int", nome, nomeFunc);
         }
-    } else if (node->type == NODE_PARAM) {
-        char* nomeParam = node->value;
-        emit("ARG", "int", nomeParam, nomeFunc);
     }
 }
 
@@ -130,23 +131,34 @@ char* geraCodigo(ASTNode* node) {
 
 	    emit("FUN", tipoRetorno, nomeFunc, "-");
 
-ASTNode* listaParams = assinatura->children[2];
-processaParams(listaParams, nomeFunc);
+	    ASTNode* listaParams = assinatura->children[2];
+	    processaParams(listaParams, nomeFunc);
+	    for (int i = 0; i < listaParams->nchildren; i++) {
+	        ASTNode* param = listaParams->children[i];
+    		char* nomeParam = param->value;
 
-	    ASTNode* blocoDecls = corpo->children[0]; // NODE_LOCAL_DECLS
+    		if (precisaLoad(nomeParam)) {
+        	    char* temp = newTemp();
+        	    emit("LOAD", temp, nomeParam, "-");
+    		}
+	}
+
+
+	    ASTNode* blocoDecls = corpo->children[0]; 
 	    for (int i = 0; i < blocoDecls->nchildren; i++) {
-	    	ASTNode* decl = blocoDecls->children[i]; // NODE_VAR_DECL
+	    	ASTNode* decl = blocoDecls->children[i]; 
 	        char* nomeVar = decl->value;
 	        emit("ALLOC", nomeVar, nomeFunc, "-");
 	    }
 
 	    geraCodigo(corpo);
 
+            emit("END", nomeFunc, "-", "-");
+
 	    if (strcmp(nomeFunc, "main") == 0) {
 	        emit("HALT", "-", "-", "-");
 	    }
 
-	    emit("END", nomeFunc, "-", "-");
 	    return NULL;
 	    }
             break;
@@ -199,17 +211,17 @@ processaParams(listaParams, nomeFunc);
             }
             break;
 
-case NODE_ARGS:
-    if (node->nchildren == 1) {
-        return geraCodigo(node->children[0]);
-    } else if (node->nchildren > 1) {
-        for (int i = 0; i < node->nchildren; i++) {
-            geraCodigo(node->children[i]);
-        }
-        return NULL;
-    } else {
-        return strdup("-");  // <- AQUI RESOLVEMOS!
-    }
+	case NODE_ARGS:
+	    if (node->nchildren == 1) {
+	        return geraCodigo(node->children[0]);
+	    } else if (node->nchildren > 1) {
+	        for (int i = 0; i < node->nchildren; i++) {
+	            geraCodigo(node->children[i]);
+	        }
+	        return NULL;
+	    } else {
+	        return strdup("-");  // <- AQUI RESOLVEMOS!
+	    }
 	
 	case NODE_ARG_LIST:
 	    for (int i = 0; i < node->nchildren; i++) {
@@ -229,20 +241,43 @@ case NODE_ARGS:
 	case NODE_OP: {
 	    if (strcmp(node->value, "=") == 0) {
 	        char* var = geraCodigo(node->children[0]);    
-	        char* expr = geraCodigo(node->children[1]);   
-	        emit("STORE", var, expr, "-");                    
-	        return var;
+
+		if (node->children[1]->type == NODE_ACTIVATION &&
+		    strcmp(node->children[1]->value, "input") == 0) {
+
+	            char* tempLoad = newTemp();   
+        	    char* tempCall = newTemp();   
+
+        	    emit("LOAD", tempLoad, var, "-");
+        	    emit("CALL", tempCall, "input", "0");
+        	    emit("ASSIGN", tempLoad, tempCall, "-");
+        	    emit("STORE", var, tempLoad, "-");
+
+        	    return var;
+    		}
+
+	        char* expr = geraCodigo(node->children[1]);
+    		emit("STORE", var, expr, "-");
+    		return var;
+	}
+
+	    else if (strcmp(node->value, "return") == 0) {
+	        if (node->nchildren == 1) {
+	            char* expr = geraCodigo(node->children[0]);
+        	    char* temp = expr;
+
+       		if (precisaLoad(expr)) {
+        	    temp = newTemp();
+        	    emit("LOAD", temp, expr, "-");
+        	}
+
+        	emit("RETURN", temp, "-", "-");
+    	    } else {
+        	emit("RETURN", "-", "-", "-");
+    	    }
+    	    return NULL;
 	    }
 
-            else if (strcmp(node->value, "return") == 0) {
-                if (node->nchildren == 1) {
-                    char* expr = geraCodigo(node->children[0]);
-                    emit("RETURN", expr, "-", "-");
-                } else {
-                    emit("RETURN", "-", "-", "-");
-                }
-                return NULL;
-            }
 
 	    else if (strcmp(node->value, "if") == 0) {
 	        char* cond = geraCodigo(node->children[0]);
@@ -260,18 +295,22 @@ case NODE_ARGS:
 	    }
         
 	    else if (strcmp(node->value, "if-else") == 0) {
-    		char* cond = geraCodigo(node->children[0]);
+	    	char* cond = geraCodigo(node->children[0]);
+
     		char labelElse[16], labelEnd[16];
-    		static int labelCount = 0;
+                static int labelCount = 0;
     		sprintf(labelElse, "L%d", labelCount++);
     		sprintf(labelEnd, "L%d", labelCount++);
 
-    		emit("IFF", cond, labelElse, "-");
-    		geraCodigo(node->children[1]);  
+    		emit("IFF", cond, labelElse, "-");        
+
+ 		geraCodigo(node->children[1]);
     		emit("GOTO", labelEnd, "-", "-");
-    		emit("LABEL", labelElse, "-", "-");
-    		geraCodigo(node->children[2]);  
-    		emit("LABEL", labelEnd, "-", "-");
+
+    		emit("LABEL", labelElse, "-", "-");       
+    		geraCodigo(node->children[2]);            
+
+    		emit("LABEL", labelEnd, "-", "-");        
     		return NULL;
 	    }
 
@@ -289,6 +328,19 @@ case NODE_ARGS:
     		emit("LABEL", labelEnd, "-", "-");
     		return NULL;
             }
+
+	    else if (strcmp(node->value, "array") == 0) {
+	    	char* vetor = geraCodigo(node->children[0]);  
+	    	char* indice = geraCodigo(node->children[1]); 
+
+    		char* tIndex = newTemp();
+    		emit("MUL", tIndex, indice, "4"); 
+
+    		char* tValor = newTemp();
+    		emit("LOAD", tValor, vetor, tIndex); 
+
+    		return tValor;
+	    }
 
 	    else {
     		char* arg1 = geraCodigo(node->children[0]);
@@ -316,8 +368,8 @@ case NODE_ARGS:
 	case NODE_ACTIVATION: {
 	    int numArgs = 0;
 
-	    if (node->nchildren > 0) {
-	        processaArgs(node->children[0], &numArgs);
+	    if (strcmp(node->value, "input") != 0 && node->nchildren > 0) {
+	        processaArgs(node->children[0], &numArgs);  // gera os PARAMs
 	    }
 
 	    char* result = newTemp();
